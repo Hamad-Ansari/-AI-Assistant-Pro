@@ -2,7 +2,7 @@
 
 🚀 A modern, production-ready AI assistant built with **Streamlit + OpenAI**, designed for developers, data scientists, and cybersecurity enthusiasts.
 
-![banner](./assets/banner.png)
+![banner](.https://chatgpt.com/c/69ec5756-3fa0-83e8-88e3-bfafc55cd99e)
 
 ---
 
