@@ -1,7 +1,9 @@
 import streamlit as st
 from openai import OpenAI
-from langchain_community.llms import OpenAI
-# ------------------ PAGE CONFIG ------------------ #
+
+# ======================================================
+# PAGE CONFIG
+# ======================================================
 st.set_page_config(
     page_title="AI Assistant Pro",
     page_icon="🤖",
@@ -9,41 +11,27 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ------------------ CUSTOM CSS ------------------ #
+# ======================================================
+# CUSTOM CSS
+# ======================================================
 st.markdown("""
 <style>
-/* Main background */
+
+/* Main App */
 .stApp {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #e2e8f0;
+    background: linear-gradient(135deg, #0f172a, #111827, #1e293b);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-/* Header styling */
+/* Header */
 .main-title {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, #38bdf8, #6366f1);
+    font-size: 3.2rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #38bdf8, #6366f1, #22c55e);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
-
-/* Chat bubbles */
-.user-msg {
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
-    padding: 12px;
-    border-radius: 12px;
-    color: white;
-    margin-bottom: 10px;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.assistant-msg {
-    background: #1e293b;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #334155;
-    margin-bottom: 10px;
-    animation: fadeIn 0.3s ease-in-out;
+    margin-bottom: 0;
 }
 
 /* Sidebar */
@@ -51,110 +39,167 @@ section[data-testid="stSidebar"] {
     background: #020617;
 }
 
-/* Button */
+/* Chat Cards */
+.user-box {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    padding: 14px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    color: white;
+}
+
+.bot-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    padding: 14px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    color: #f8fafc;
+}
+
+/* Buttons */
 .stButton>button {
     background: linear-gradient(90deg, #6366f1, #22c55e);
     color: white;
-    border-radius: 8px;
+    border-radius: 10px;
     border: none;
 }
 
-/* Input box */
+/* Inputs */
 input {
     border-radius: 10px !important;
 }
 
-/* Animation */
-@keyframes fadeIn {
-    from {opacity: 0; transform: translateY(10px);}
-    to {opacity: 1; transform: translateY(0);}
-}
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------ SIDEBAR ------------------ #
+# ======================================================
+# SIDEBAR
+# ======================================================
 st.sidebar.title("🔐 Configuration")
 
 api_key = st.sidebar.text_input(
-    "OpenAI API Key",
-    type="password",
-    help="Paste your API key here"
+    "Enter OpenAI API Key",
+    type="password"
 )
 
 st.sidebar.markdown("""
 ---
-### ⚙️ Settings
-- Model: GPT-4o-mini  
-- Mode: Smart Assistant  
-- UI: Pro Theme  
+### ⚙️ Model Settings
+- Model: `gpt-4o-mini`
+- Theme: Dark Pro
+- Response: Smart Mode
 
 ---
 ### 📌 Tips
 - Ask coding questions  
-- Request ML models  
-- Debug errors  
+- Ask ML / AI questions  
+- Ask cybersecurity topics  
 """)
 
-# ------------------ HEADER ------------------ #
-st.markdown('<div class="main-title">🤖 AI Assistant Pro</div>', unsafe_allow_html=True)
-st.caption("🚀 Advanced AI for Coding, ML & Cybersecurity")
+# ======================================================
+# HEADER
+# ======================================================
+st.markdown('<p class="main-title">🤖 AI Assistant Pro</p>', unsafe_allow_html=True)
+st.caption("🚀 Built with Streamlit & OpenAI")
 
-# ------------------ SESSION ------------------ #
+# ======================================================
+# SESSION STATE
+# ======================================================
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# ------------------ DISPLAY CHAT ------------------ #
-for message in st.session_state.messages:
-    if message["role"] == "user":
-        st.markdown(f'<div class="user-msg">🧑‍💻 {message["content"]}</div>', unsafe_allow_html=True)
+# ======================================================
+# DISPLAY CHAT HISTORY
+# ======================================================
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(
+            f'<div class="user-box">🧑 {msg["content"]}</div>',
+            unsafe_allow_html=True
+        )
     else:
-        st.markdown(f'<div class="assistant-msg">🤖 {message["content"]}</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="bot-box">🤖 {msg["content"]}</div>',
+            unsafe_allow_html=True
+        )
 
-# ------------------ INPUT ------------------ #
-user_input = st.chat_input("💬 Ask anything...")
+# ======================================================
+# CHAT INPUT
+# ======================================================
+prompt = st.chat_input("💬 Ask me anything...")
 
-if user_input:
+if prompt:
+
     if not api_key:
-        st.warning("⚠️ Please enter API key")
+        st.warning("⚠️ Please enter your OpenAI API key in sidebar.")
         st.stop()
 
-    client = OpenAI(api_key=api_key)
+    # Show user instantly
+    st.session_state.messages.append(
+        {"role": "user", "content": prompt}
+    )
 
-    # Save user message
-    st.session_state.messages.append({"role": "user", "content": user_input})
+    st.markdown(
+        f'<div class="user-box">🧑 {prompt}</div>',
+        unsafe_allow_html=True
+    )
 
-    # Show instantly
-    st.markdown(f'<div class="user-msg">🧑‍💻 {user_input}</div>', unsafe_allow_html=True)
+    # Create client
+    try:
+        client = OpenAI(api_key=api_key)
+    except Exception as e:
+        st.error("❌ Invalid API Key")
+        st.stop()
 
+    # System prompt
     system_prompt = """
-    You are an expert AI assistant in:
-    - Machine Learning
-    - Data Science
-    - Cybersecurity
-    - Python
+You are a professional AI assistant specialized in:
 
-    Give clear, structured, and practical answers.
-    """
+- Python Programming
+- Machine Learning
+- Data Science
+- Cybersecurity
 
+Always provide:
+- Clear answers
+- Structured responses
+- Practical solutions
+- Clean code examples
+"""
+
+    # Prepare messages
+    messages = [{"role": "system", "content": system_prompt}]
+
+    for m in st.session_state.messages:
+        messages.append({
+            "role": m["role"],
+            "content": m["content"]
+        })
+
+    # Generate Response
     with st.spinner("🤖 Thinking..."):
         try:
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    *st.session_state.messages
-                ],
-                temperature=0.7
+                messages=messages,
+                temperature=0.7,
+                max_tokens=700
             )
 
             reply = response.choices[0].message.content
 
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.error(f"❌ API Error: {e}")
             st.stop()
 
-    # Save response
-    st.session_state.messages.append({"role": "assistant", "content": reply})
+    # Save assistant response
+    st.session_state.messages.append(
+        {"role": "assistant", "content": reply}
+    )
 
-    # Display response
-    st.markdown(f'<div class="assistant-msg">🤖 {reply}</div>', unsafe_allow_html=True)
+    # Show assistant response
+    st.markdown(
+        f'<div class="bot-box">🤖 {reply}</div>',
+        unsafe_allow_html=True
+    )
