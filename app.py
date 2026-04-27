@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import OpenAI
-
+from langchain_community.llms import OpenAI
 # ------------------ PAGE CONFIG ------------------ #
 st.set_page_config(
     page_title="AI Assistant Pro",
