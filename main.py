@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain_community.llms import OpenAI
-
+from langchain_community.llms import OpenAI
 st.set_page_config(page_title="Quickstart App", layout="centered")
 
 st.title('🦜🔗 Quickstart App')
