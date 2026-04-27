@@ -4,3 +4,9 @@ pandas
 numpy
 plotly
 matplotlib
+streamlit
+google-generativeai
+pandas
+numpy
+plotly
+matplotlib
